@@ -21,15 +21,18 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Email sending states
+  // Email verification states
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [emailData, setEmailData] = useState({
     email: '',
     userName: '',
-    otpCode: ''
+    otpCode: '',
+    enteredOtp: ''
   });
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [otpVerified, setOtpVerified] = useState(false);
   
 
   const handleCredentialResponse = useCallback((response: google.accounts.id.CredentialResponse) => {
@@ -195,6 +198,53 @@ function App() {
     setEmailData(prev => ({ ...prev, [field]: value }));
     setEmailError(null);
     setEmailSent(false);
+    setOtpVerified(false);
+  };
+
+  // Verify OTP
+  const verifyOTP = () => {
+    if (emailData.enteredOtp === emailData.otpCode) {
+      setOtpVerified(true);
+      setEmailError(null);
+      
+      // Create a mock user for email verification
+      const mockUser: User = {
+        id: 'email-' + Date.now(),
+        name: emailData.userName,
+        email: emailData.email,
+        picture: 'https://via.placeholder.com/80x80/007acc/ffffff?text=' + emailData.userName.charAt(0).toUpperCase()
+      };
+      
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      
+      // Close email verification dialog
+      setShowEmailVerification(false);
+    } else {
+      setEmailError('Invalid OTP code. Please try again.');
+    }
+  };
+
+  // Open email verification dialog
+  const openEmailVerification = () => {
+    setShowEmailVerification(true);
+    setEmailError(null);
+    setEmailSent(false);
+    setOtpVerified(false);
+  };
+
+  // Close email verification dialog
+  const closeEmailVerification = () => {
+    setShowEmailVerification(false);
+    setEmailData({
+      email: '',
+      userName: '',
+      otpCode: '',
+      enteredOtp: ''
+    });
+    setEmailError(null);
+    setEmailSent(false);
+    setOtpVerified(false);
   };
 
   // Check for existing user session on component mount
@@ -338,74 +388,12 @@ function App() {
           )}
           
           <div className="login-content">
-            <div className="email-form-section">
-              <h4>📧 Send Email with OTP</h4>
-              <p style={{color: '#cccccc', fontSize: '14px', textAlign: 'center', marginBottom: '15px'}}>
-                Fill in the form below to send an OTP email before signing in
-              </p>
-              <div className="email-form">
-                <div className="form-group">
-                  <label htmlFor="email">Email Address:</label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={emailData.email}
-                    onChange={(e) => handleEmailInputChange('email', e.target.value)}
-                    placeholder="Enter recipient email"
-                    className="form-input"
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="userName">User Name:</label>
-                  <input
-                    type="text"
-                    id="userName"
-                    value={emailData.userName}
-                    onChange={(e) => handleEmailInputChange('userName', e.target.value)}
-                    placeholder="Enter user name"
-                    className="form-input"
-                  />
-                </div>
-
-                {emailData.otpCode && (
-                  <div className="form-group">
-                    <label>Generated OTP Code:</label>
-                    <div className="otp-display">
-                      <code>{emailData.otpCode}</code>
-                      <small>Check console for details</small>
-                    </div>
-                  </div>
-                )}
-
-                {emailError && (
-                  <div className="error-message">
-                    {emailError}
-                  </div>
-                )}
-
-                {emailSent && (
-                  <div className="success-message">
-                    ✅ Email sent successfully! Check the recipient's inbox.
-                  </div>
-                )}
-
-                <button
-                  onClick={sendEmail}
-                  disabled={isEmailLoading}
-                  className="send-email-btn"
-                >
-                  {isEmailLoading ? (
-                    <>
-                      <span className="spinner"></span>
-                      Sending...
-                    </>
-                  ) : (
-                    'Send Email with OTP'
-                  )}
-                </button>
-              </div>
-            </div>
+            <button 
+              onClick={openEmailVerification}
+              className="email-verification-btn"
+            >
+              📧 Sign in with Email Verification
+            </button>
 
             <div className="login-divider">
               <span>OR</span>
@@ -430,6 +418,126 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Email Verification Dialog */}
+      {showEmailVerification && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>📧 Email Verification</h3>
+              <button 
+                onClick={closeEmailVerification}
+                className="close-btn"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              {!emailSent ? (
+                <div>
+                  <p>Enter your details to receive an OTP code via email:</p>
+                  
+                  <div className="form-group">
+                    <label>Email Address:</label>
+                    <input
+                      type="email"
+                      value={emailData.email}
+                      onChange={(e) => handleEmailInputChange('email', e.target.value)}
+                      placeholder="Enter your email"
+                      className="form-input"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Your Name:</label>
+                    <input
+                      type="text"
+                      value={emailData.userName}
+                      onChange={(e) => handleEmailInputChange('userName', e.target.value)}
+                      placeholder="Enter your name"
+                      className="form-input"
+                    />
+                  </div>
+
+                  {emailError && (
+                    <div className="error-message">
+                      {emailError}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={sendEmail}
+                    disabled={isEmailLoading || !emailData.email || !emailData.userName}
+                    className="send-email-btn"
+                  >
+                    {isEmailLoading ? (
+                      <>
+                        <span className="spinner"></span>
+                        Sending OTP...
+                      </>
+                    ) : (
+                      'Send OTP Code'
+                    )}
+                  </button>
+                </div>
+              ) : !otpVerified ? (
+                <div>
+                  <div className="success-message">
+                    ✅ OTP sent to {emailData.email}
+                  </div>
+                  
+                  <p>Enter the 6-digit code you received:</p>
+                  
+                  <div className="form-group">
+                    <label>OTP Code:</label>
+                    <input
+                      type="text"
+                      value={emailData.enteredOtp}
+                      onChange={(e) => handleEmailInputChange('enteredOtp', e.target.value)}
+                      placeholder="Enter 6-digit code"
+                      className="form-input otp-input"
+                      maxLength={6}
+                    />
+                  </div>
+
+                  {emailData.otpCode && (
+                    <div className="otp-display">
+                      <small>Debug: Generated OTP is {emailData.otpCode}</small>
+                    </div>
+                  )}
+
+                  {emailError && (
+                    <div className="error-message">
+                      {emailError}
+                    </div>
+                  )}
+
+                  <div className="modal-actions">
+                    <button
+                      onClick={verifyOTP}
+                      disabled={emailData.enteredOtp.length !== 6}
+                      className="verify-otp-btn"
+                    >
+                      Verify & Sign In
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        setEmailSent(false);
+                        setEmailData(prev => ({ ...prev, otpCode: '', enteredOtp: '' }));
+                      }}
+                      className="resend-btn"
+                    >
+                      Send New Code
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
