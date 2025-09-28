@@ -22,6 +22,7 @@
     }
   ],
   "env": {
-    "REACT_APP_GOOGLE_CLIENT_ID": "@google_client_id"
+    "REACT_APP_GOOGLE_CLIENT_ID": "@google_client_id",
+    "REACT_APP_GOOGLE_CLIENT_SECRET": "@google_client_secret"
   }
 }
