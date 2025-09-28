@@ -72,13 +72,7 @@ function App() {
     console.log('Current domain:', window.location.origin);
     
     if (!clientId) {
-      setError('Google Client ID not configured. Please add REACT_APP_GOOGLE_CLIENT_ID to your environment variables.');
-      return;
-    }
-    
-    // Validate Client ID format
-    if (!clientId.includes('.apps.googleusercontent.com')) {
-      setError('Invalid Google Client ID format. Expected format: xxxxxx-xxxxx.apps.googleusercontent.com');
+      setError('Google Client ID not configured');
       return;
     }
     
