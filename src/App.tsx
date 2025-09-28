@@ -119,7 +119,7 @@ function App() {
   if (user) {
     return (
       <div className="app">
-        <div className="container">
+        <div className="dashboard-container">
           <div className="welcome-card">
             <div className="user-info">
               <img 
@@ -127,8 +127,10 @@ function App() {
                 alt={user.name} 
                 className="user-avatar"
               />
-              <h1>Welcome, {user.name}!</h1>
-              <p className="user-email">{user.email}</p>
+              <div>
+                <h1>Welcome, {user.name}!</h1>
+                <p className="user-email">{user.email}</p>
+              </div>
             </div>
             <button 
               onClick={handleSignOut}
@@ -136,6 +138,90 @@ function App() {
             >
               Sign Out
             </button>
+          </div>
+          
+          <div className="dashboard">
+            <div className="sidebar">
+              <nav>
+                <ul className="sidebar-nav">
+                  <li>
+                    <a href="#dashboard" className="active">
+                      <span className="nav-icon">📊</span>
+                      Dashboard
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#projects">
+                      <span className="nav-icon">📁</span>
+                      Projects
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#analytics">
+                      <span className="nav-icon">📈</span>
+                      Analytics
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#settings">
+                      <span className="nav-icon">⚙️</span>
+                      Settings
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#help">
+                      <span className="nav-icon">❓</span>
+                      Help
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+            
+            <div className="main-content">
+              <div className="dashboard-header">
+                <div>
+                  <h2 className="dashboard-title">Dashboard</h2>
+                  <p className="dashboard-subtitle">Welcome back! Here's what's happening.</p>
+                </div>
+              </div>
+              
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <div className="stat-value">24</div>
+                  <div className="stat-label">Active Projects</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-value">1,247</div>
+                  <div className="stat-label">Total Views</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-value">89%</div>
+                  <div className="stat-label">Success Rate</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-value">$12,450</div>
+                  <div className="stat-label">Revenue</div>
+                </div>
+              </div>
+              
+              <div className="content-grid">
+                <div className="content-card">
+                  <h3>Recent Activity</h3>
+                  <p>• Project "Website Redesign" completed</p>
+                  <p>• New user registered</p>
+                  <p>• Analytics report generated</p>
+                  <p>• System backup completed</p>
+                </div>
+                <div className="content-card">
+                  <h3>Quick Actions</h3>
+                  <p>• Create new project</p>
+                  <p>• View analytics</p>
+                  <p>• Export data</p>
+                  <p>• Update profile</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
