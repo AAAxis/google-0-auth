@@ -340,6 +340,9 @@ function App() {
           <div className="login-content">
             <div className="email-form-section">
               <h4>📧 Send Email with OTP</h4>
+              <p style={{color: '#cccccc', fontSize: '14px', textAlign: 'center', marginBottom: '15px'}}>
+                Fill in the form below to send an OTP email before signing in
+              </p>
               <div className="email-form">
                 <div className="form-group">
                   <label htmlFor="email">Email Address:</label>
