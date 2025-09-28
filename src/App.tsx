@@ -60,9 +60,27 @@ function App() {
   }, []);
 
   const initializeGoogleSignIn = useCallback(() => {
+    const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+    
+    // Debug logging
+    console.log('Google Client ID:', clientId ? 'Loaded' : 'Missing');
+    console.log('Client ID value:', clientId);
+    console.log('Current domain:', window.location.origin);
+    
+    if (!clientId) {
+      setError('Google Client ID not configured. Please check your environment variables.');
+      return;
+    }
+    
+    // Validate Client ID format
+    if (!clientId.includes('.apps.googleusercontent.com')) {
+      setError('Invalid Google Client ID format. Please check your environment variables.');
+      return;
+    }
+    
     if (window.google) {
       window.google.accounts.id.initialize({
-        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
+        client_id: clientId,
         callback: handleCredentialResponse,
         auto_select: false,
         cancel_on_tap_outside: true,
