@@ -30,6 +30,7 @@ function App() {
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
+  
 
   const handleCredentialResponse = useCallback((response: google.accounts.id.CredentialResponse) => {
     setIsLoading(true);
@@ -314,71 +315,6 @@ function App() {
                 </div>
               </div>
 
-              <div className="content-card" style={{ gridColumn: '1 / -1' }}>
-                <h3>📧 Send Email with OTP</h3>
-                <div className="email-form">
-                  <div className="form-group">
-                    <label htmlFor="email">Email Address:</label>
-                    <input
-                      type="email"
-                      id="email"
-                      value={emailData.email}
-                      onChange={(e) => handleEmailInputChange('email', e.target.value)}
-                      placeholder="Enter recipient email"
-                      className="form-input"
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="userName">User Name:</label>
-                    <input
-                      type="text"
-                      id="userName"
-                      value={emailData.userName}
-                      onChange={(e) => handleEmailInputChange('userName', e.target.value)}
-                      placeholder="Enter user name"
-                      className="form-input"
-                    />
-                  </div>
-
-                  {emailData.otpCode && (
-                    <div className="form-group">
-                      <label>Generated OTP Code:</label>
-                      <div className="otp-display">
-                        <code>{emailData.otpCode}</code>
-                        <small>Check console for details</small>
-                      </div>
-                    </div>
-                  )}
-
-                  {emailError && (
-                    <div className="error-message">
-                      {emailError}
-                    </div>
-                  )}
-
-                  {emailSent && (
-                    <div className="success-message">
-                      ✅ Email sent successfully! Check the recipient's inbox.
-                    </div>
-                  )}
-
-                  <button
-                    onClick={sendEmail}
-                    disabled={isEmailLoading}
-                    className="send-email-btn"
-                  >
-                    {isEmailLoading ? (
-                      <>
-                        <span className="spinner"></span>
-                        Sending...
-                      </>
-                    ) : (
-                      'Send Email with OTP'
-                    )}
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -402,6 +338,76 @@ function App() {
           )}
           
           <div className="login-content">
+            <div className="email-form-section">
+              <h4>📧 Send Email with OTP</h4>
+              <div className="email-form">
+                <div className="form-group">
+                  <label htmlFor="email">Email Address:</label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={emailData.email}
+                    onChange={(e) => handleEmailInputChange('email', e.target.value)}
+                    placeholder="Enter recipient email"
+                    className="form-input"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="userName">User Name:</label>
+                  <input
+                    type="text"
+                    id="userName"
+                    value={emailData.userName}
+                    onChange={(e) => handleEmailInputChange('userName', e.target.value)}
+                    placeholder="Enter user name"
+                    className="form-input"
+                  />
+                </div>
+
+                {emailData.otpCode && (
+                  <div className="form-group">
+                    <label>Generated OTP Code:</label>
+                    <div className="otp-display">
+                      <code>{emailData.otpCode}</code>
+                      <small>Check console for details</small>
+                    </div>
+                  </div>
+                )}
+
+                {emailError && (
+                  <div className="error-message">
+                    {emailError}
+                  </div>
+                )}
+
+                {emailSent && (
+                  <div className="success-message">
+                    ✅ Email sent successfully! Check the recipient's inbox.
+                  </div>
+                )}
+
+                <button
+                  onClick={sendEmail}
+                  disabled={isEmailLoading}
+                  className="send-email-btn"
+                >
+                  {isEmailLoading ? (
+                    <>
+                      <span className="spinner"></span>
+                      Sending...
+                    </>
+                  ) : (
+                    'Send Email with OTP'
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="login-divider">
+              <span>OR</span>
+            </div>
+
             <div id="google-signin-button"></div>
             
             {isLoading && (
