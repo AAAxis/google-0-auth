@@ -421,18 +421,21 @@ button:focus,
 /* Email Form Styles */
 .email-form-section {
   margin-bottom: 30px;
-  padding: 20px;
-  background: #1e1e1e;
-  border-radius: 8px;
-  border: 1px solid #3e3e42;
+  padding: 25px;
+  background: #2d2d30;
+  border-radius: 12px;
+  border: 2px solid #007acc;
+  box-shadow: 0 4px 12px rgba(0, 122, 204, 0.2);
 }
 
 .email-form-section h4 {
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 15px;
+  color: #007acc;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
   text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .email-form {
