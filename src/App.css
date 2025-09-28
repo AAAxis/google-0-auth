@@ -420,9 +420,9 @@ button:focus,
 
 /* Email Verification Button */
 .email-verification-btn {
-  background: #28a745;
-  color: white;
-  border: none;
+  background: white;
+  color: #333;
+  border: 1px solid #ddd;
   padding: 14px 24px;
   border-radius: 8px;
   font-size: 16px;
@@ -431,13 +431,13 @@ button:focus,
   transition: all 0.2s ease;
   width: 100%;
   margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .email-verification-btn:hover {
-  background: #218838;
+  background: #f8f9fa;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .email-verification-btn:active {
@@ -532,17 +532,25 @@ button:focus,
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   margin-top: 10px;
+  position: relative;
+  overflow: hidden;
 }
 
 .send-email-btn:hover:not(:disabled) {
   background: #005a9e;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 122, 204, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 122, 204, 0.4);
+}
+
+.send-email-btn:active:not(:disabled) {
+  transform: translateY(0);
+  transition: all 0.1s ease;
 }
 
 .send-email-btn:disabled {
@@ -550,6 +558,33 @@ button:focus,
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+/* Loading state animation */
+.send-email-btn:disabled .spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff40;
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Pulse animation when loading */
+.send-email-btn:disabled {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 122, 204, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 122, 204, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 122, 204, 0);
+  }
 }
 
 .success-message {

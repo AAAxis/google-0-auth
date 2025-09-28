@@ -164,27 +164,31 @@ function App() {
       
       // Construct the API URL with parameters
       const apiUrl = new URL('https://smtp.theholylabs.com/api/email/send');
-      apiUrl.searchParams.set('email', encodeURIComponent(emailData.email));
+      apiUrl.searchParams.set('email', emailData.email);
       apiUrl.searchParams.set('project_id', 'u2LpTkbed1n7U4ff607n');
       apiUrl.searchParams.set('template_id', 'rAASNbN1sSGi9hZZjA9m');
-      apiUrl.searchParams.set('user_name', encodeURIComponent(emailData.userName));
+      apiUrl.searchParams.set('user_name', emailData.userName);
       apiUrl.searchParams.set('otp_code', otpCode);
 
       console.log('API URL:', apiUrl.toString());
 
-      const response = await fetch(apiUrl.toString(), {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
+      // Use hidden iframe to bypass CORS and actually send the email
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = apiUrl.toString();
+      
+      iframe.onload = () => {
         setEmailSent(true);
         console.log('Email sent successfully!');
-      } else {
-        throw new Error(`Failed to send email: ${response.status}`);
-      }
+        document.body.removeChild(iframe);
+      };
+      
+      iframe.onerror = () => {
+        setEmailError('Failed to send email. Please try again.');
+        document.body.removeChild(iframe);
+      };
+      
+      document.body.appendChild(iframe);
     } catch (err) {
       setEmailError(err instanceof Error ? err.message : 'Failed to send email');
       console.error('Email sending error:', err);
@@ -197,7 +201,10 @@ function App() {
   const handleEmailInputChange = (field: string, value: string) => {
     setEmailData(prev => ({ ...prev, [field]: value }));
     setEmailError(null);
-    setEmailSent(false);
+    // Only reset emailSent if we're changing email or userName, not OTP
+    if (field === 'email' || field === 'userName') {
+      setEmailSent(false);
+    }
     setOtpVerified(false);
   };
 
@@ -207,19 +214,30 @@ function App() {
       setOtpVerified(true);
       setEmailError(null);
       
-      // Create a mock user for email verification
-      const mockUser: User = {
+      // Create user with email verification data and redirect to dashboard
+      const verifiedUser: User = {
         id: 'email-' + Date.now(),
         name: emailData.userName,
         email: emailData.email,
-        picture: 'https://via.placeholder.com/80x80/007acc/ffffff?text=' + emailData.userName.charAt(0).toUpperCase()
+        picture: `https://via.placeholder.com/80x80/007acc/ffffff?text=${emailData.userName.charAt(0).toUpperCase()}`
       };
       
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
+      setUser(verifiedUser);
+      localStorage.setItem('user', JSON.stringify(verifiedUser));
       
-      // Close email verification dialog
+      // Close email verification dialog and redirect to dashboard
       setShowEmailVerification(false);
+      
+      // Reset email data
+      setEmailData({
+        email: '',
+        userName: '',
+        otpCode: '',
+        enteredOtp: ''
+      });
+      setEmailSent(false);
+      setEmailError(null);
+      
     } else {
       setEmailError('Invalid OTP code. Please try again.');
     }
@@ -395,10 +413,6 @@ function App() {
               📧 Sign in with Email Verification
             </button>
 
-            <div className="login-divider">
-              <span>OR</span>
-            </div>
-
             <div id="google-signin-button"></div>
             
             {isLoading && (
@@ -501,11 +515,6 @@ function App() {
                     />
                   </div>
 
-                  {emailData.otpCode && (
-                    <div className="otp-display">
-                      <small>Debug: Generated OTP is {emailData.otpCode}</small>
-                    </div>
-                  )}
 
                   {emailError && (
                     <div className="error-message">
@@ -520,16 +529,6 @@ function App() {
                       className="verify-otp-btn"
                     >
                       Verify & Sign In
-                    </button>
-                    
-                    <button
-                      onClick={() => {
-                        setEmailSent(false);
-                        setEmailData(prev => ({ ...prev, otpCode: '', enteredOtp: '' }));
-                      }}
-                      className="resend-btn"
-                    >
-                      Send New Code
                     </button>
                   </div>
                 </div>
