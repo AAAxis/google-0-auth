@@ -60,7 +60,8 @@ function App() {
   }, []);
 
   const initializeGoogleSignIn = useCallback(() => {
-    const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+    // For testing - replace with your actual Client ID
+    const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || '123456789-abcdefghijklmnop.apps.googleusercontent.com';
     
     // Debug logging
     console.log('Google Client ID:', clientId ? 'Loaded' : 'Missing');
