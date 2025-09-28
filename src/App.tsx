@@ -20,6 +20,16 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Email sending states
+  const [emailData, setEmailData] = useState({
+    email: '',
+    userName: '',
+    otpCode: ''
+  });
+  const [isEmailLoading, setIsEmailLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const handleCredentialResponse = useCallback((response: google.accounts.id.CredentialResponse) => {
     setIsLoading(true);
@@ -102,6 +112,70 @@ function App() {
     if (window.google) {
       window.google.accounts.id.disableAutoSelect();
     }
+  };
+
+  // Generate 6-digit OTP code
+  const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  };
+
+  // Send email with OTP
+  const sendEmail = async () => {
+    if (!emailData.email || !emailData.userName) {
+      setEmailError('Please fill in all required fields');
+      return;
+    }
+
+    setIsEmailLoading(true);
+    setEmailError(null);
+    setEmailSent(false);
+
+    try {
+      const otpCode = generateOTP();
+      
+      // Update state with generated OTP
+      setEmailData(prev => ({ ...prev, otpCode }));
+      
+      // Log the OTP to console as requested
+      console.log(`Generated OTP: ${otpCode}`);
+      console.log(`Sending email to: ${emailData.email}`);
+      
+      // Construct the API URL with parameters
+      const apiUrl = new URL('https://smtp.theholylabs.com/api/email/send');
+      apiUrl.searchParams.set('email', encodeURIComponent(emailData.email));
+      apiUrl.searchParams.set('project_id', 'u2LpTkbed1n7U4ff607n');
+      apiUrl.searchParams.set('template_id', 'rAASNbN1sSGi9hZZjA9m');
+      apiUrl.searchParams.set('user_name', encodeURIComponent(emailData.userName));
+      apiUrl.searchParams.set('otp_code', otpCode);
+
+      console.log('API URL:', apiUrl.toString());
+
+      const response = await fetch(apiUrl.toString(), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        setEmailSent(true);
+        console.log('Email sent successfully!');
+      } else {
+        throw new Error(`Failed to send email: ${response.status}`);
+      }
+    } catch (err) {
+      setEmailError(err instanceof Error ? err.message : 'Failed to send email');
+      console.error('Email sending error:', err);
+    } finally {
+      setIsEmailLoading(false);
+    }
+  };
+
+  // Handle form input changes
+  const handleEmailInputChange = (field: string, value: string) => {
+    setEmailData(prev => ({ ...prev, [field]: value }));
+    setEmailError(null);
+    setEmailSent(false);
   };
 
   // Check for existing user session on component mount
@@ -219,6 +293,72 @@ function App() {
                   <p>• View analytics</p>
                   <p>• Export data</p>
                   <p>• Update profile</p>
+                </div>
+              </div>
+
+              <div className="content-card" style={{ gridColumn: '1 / -1' }}>
+                <h3>📧 Send Email with OTP</h3>
+                <div className="email-form">
+                  <div className="form-group">
+                    <label htmlFor="email">Email Address:</label>
+                    <input
+                      type="email"
+                      id="email"
+                      value={emailData.email}
+                      onChange={(e) => handleEmailInputChange('email', e.target.value)}
+                      placeholder="Enter recipient email"
+                      className="form-input"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="userName">User Name:</label>
+                    <input
+                      type="text"
+                      id="userName"
+                      value={emailData.userName}
+                      onChange={(e) => handleEmailInputChange('userName', e.target.value)}
+                      placeholder="Enter user name"
+                      className="form-input"
+                    />
+                  </div>
+
+                  {emailData.otpCode && (
+                    <div className="form-group">
+                      <label>Generated OTP Code:</label>
+                      <div className="otp-display">
+                        <code>{emailData.otpCode}</code>
+                        <small>Check console for details</small>
+                      </div>
+                    </div>
+                  )}
+
+                  {emailError && (
+                    <div className="error-message">
+                      {emailError}
+                    </div>
+                  )}
+
+                  {emailSent && (
+                    <div className="success-message">
+                      ✅ Email sent successfully! Check the recipient's inbox.
+                    </div>
+                  )}
+
+                  <button
+                    onClick={sendEmail}
+                    disabled={isEmailLoading}
+                    className="send-email-btn"
+                  >
+                    {isEmailLoading ? (
+                      <>
+                        <span className="spinner"></span>
+                        Sending...
+                      </>
+                    ) : (
+                      'Send Email with OTP'
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
