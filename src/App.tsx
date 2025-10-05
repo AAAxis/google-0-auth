@@ -156,7 +156,7 @@ function App() {
       console.log(`Sending email to: ${emailData.email}`);
       
       // Construct the API URL with parameters
-      const apiUrl = new URL('https://smtp.theholylabs.com/api/email/send');
+      const apiUrl = new URL('https://smtp.roamjet.net/api/email/send');
       apiUrl.searchParams.set('email', emailData.email);
       apiUrl.searchParams.set('project_id', 'u2LpTkbed1n7U4ff607n');
       apiUrl.searchParams.set('template_id', 'rAASNbN1sSGi9hZZjA9m');
